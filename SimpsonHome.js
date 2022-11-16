@@ -509,7 +509,7 @@ function DrawPicFrame() {
 
 	// Draw Sky
 	materialAmbient = vec4( .2, .2, .2, 1.0 );
-    materialDiffuse = vec4( 55/255, 164/255, 246/255, 1.0);
+    materialDiffuse = vec4( 86/255, 125/255, 70/255, 1.0);
     materialSpecular = vec4( .1, .1, .1, 1.0 );
     materialShiness = 0;
     SetupLightMat();
@@ -522,6 +522,69 @@ function DrawPicFrame() {
     gl.drawArrays( gl.TRIANGLES, 0, 36);
 	modelViewMatrix = mvMatrixStack.pop();
 
+	// Draw Boat
+	materialAmbient = vec4( .2, .2, .2, 1.0 );
+    materialDiffuse = vec4( 255/255, 0/255, 0/255, 1.0);
+    materialSpecular = vec4( .1, .1, .1, 1.0 );
+    materialShiness = 0;
+    SetupLightMat();
+	mvMatrixStack.push(modelViewMatrix);
+	s = scale4(0.10, .05, 0.01);
+	modelViewMatrix = mult(modelViewMatrix, s);
+	t=translate(5, 20, 15); 
+    modelViewMatrix = mult(modelViewMatrix, t);
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
+    gl.drawArrays( gl.TRIANGLES, 0, 36);
+	modelViewMatrix = mvMatrixStack.pop();
+
+
+	// Draw Vertical Rod
+	materialAmbient = vec4( .2, .2, .2, 1.0 );
+    materialDiffuse = vec4( 255/255, 255/255, 255/255, 1.0);
+    materialSpecular = vec4( .1, .1, .1, 1.0 );
+    materialShiness = 0;
+    SetupLightMat();
+	mvMatrixStack.push(modelViewMatrix);
+	s = scale4(0.01, .10, 0.01);
+	modelViewMatrix = mult(modelViewMatrix, s);
+	t=translate(52, 11.25, 20); 
+    modelViewMatrix = mult(modelViewMatrix, t);
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
+    gl.drawArrays( gl.TRIANGLES, 0, 36);
+	modelViewMatrix = mvMatrixStack.pop();
+
+	// Draw 1st Sail
+	materialAmbient = vec4( .2, .2, .2, 1.0 );
+    materialDiffuse = vec4( 255/255, 255/255, 255/255, 1.0);
+    materialSpecular = vec4( .1, .1, .1, 1.0 );
+    materialShiness = 0;
+    SetupLightMat();
+	mvMatrixStack.push(modelViewMatrix);
+	s = scale4(0.05, .05, 0.01);
+	modelViewMatrix = mult(modelViewMatrix, s);
+	t=translate(10, 23.5, 25); 
+    modelViewMatrix = mult(modelViewMatrix, t);
+	//modelViewMatrix = mult(modelViewMatrix, rotate([90], [0, 0, 1] ));
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
+    gl.drawArrays( gl.TRIANGLES, 0, 36);
+	modelViewMatrix = mvMatrixStack.pop();
+
+
+	// Draw 2nd Sail
+	// materialAmbient = vec4( .2, .2, .2, 1.0 );
+    // materialDiffuse = vec4( 255/255, 255/255, 255/255, 1.0);
+    // materialSpecular = vec4( .1, .1, .1, 1.0 );
+    // materialShiness = 0;
+    // SetupLightMat();
+	// mvMatrixStack.push(modelViewMatrix);
+	// s = scale4(0.05, .05, 0.01);
+	// modelViewMatrix = mult(modelViewMatrix, s);
+	// t=translate(11.5, 23.5, 25); 
+    // modelViewMatrix = mult(modelViewMatrix, t);
+	// //modelViewMatrix = mult(modelViewMatrix, rotate([90], [0, 0, 1] ));
+    // gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
+    // gl.drawArrays( gl.TRIANGLES, 0, 36);
+	// modelViewMatrix = mvMatrixStack.pop();
 }
 
 function render()
