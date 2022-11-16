@@ -28,6 +28,15 @@ var cylinderCount = 0;
 
 var rugHalfCircleCount = 132;
 
+const NUM_CONE_POINTS = 200;
+const NUM_CYLINDER_POINTS = 600;
+let currCylinderPoint = 0;
+let cylinderVertA = [];
+let cylinderVertB = [];
+const cylinderSize = 50;
+let nPhi = 100;
+let currPointNum = 15224
+
 var circleOneVert = [];
 var circleTwoVert = [];
 
@@ -171,6 +180,21 @@ window.onload = function init()
 	BuildSofa();
 	// Build Rug Points 
     HalfCircle();
+
+	// Build Lamp Points
+	// Lamp head
+	generateConePoints(0.6, 0.05, 0.85, vec4(0.79, 0.93, 0.923, 1.0));
+
+	// Lamp stand
+	const pA = vec4(0.0, 0.0, 0.0, 1.0);
+	const pB = vec4(0.0, 0.0, 1.0, 1.0);
+	const barColor = vec4(0.396, 0.428, 0.72, 1.0);
+	genenerateCylinderPoints([0, 0], pA, pB, 0.05, barColor, barColor);
+	genenerateCylinderPoints([0, 0], pA, pB, 0.075, barColor, barColor);
+	genenerateCylinderPoints([0, 0], pA, pB, 0.1, barColor, barColor);
+
+	// Lamp base
+	generateConePoints(0.75, 0.1, 0.3, barColor);
 
     // pass data onto GPU
     var nBuffer = gl.createBuffer();
@@ -568,24 +592,78 @@ function DrawPicFrame() {
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
     gl.drawArrays( gl.TRIANGLES, 0, 36);
 	modelViewMatrix = mvMatrixStack.pop();
-
-
-	// Draw 2nd Sail
-	// materialAmbient = vec4( .2, .2, .2, 1.0 );
-    // materialDiffuse = vec4( 255/255, 255/255, 255/255, 1.0);
-    // materialSpecular = vec4( .1, .1, .1, 1.0 );
-    // materialShiness = 0;
-    // SetupLightMat();
-	// mvMatrixStack.push(modelViewMatrix);
-	// s = scale4(0.05, .05, 0.01);
-	// modelViewMatrix = mult(modelViewMatrix, s);
-	// t=translate(11.5, 23.5, 25); 
-    // modelViewMatrix = mult(modelViewMatrix, t);
-	// //modelViewMatrix = mult(modelViewMatrix, rotate([90], [0, 0, 1] ));
-    // gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
-    // gl.drawArrays( gl.TRIANGLES, 0, 36);
-	// modelViewMatrix = mvMatrixStack.pop();
 }
+
+
+function DrawFloorLamp() {
+	materialAmbient = vec4( .2, .2, .2, 1.0 );
+    materialDiffuse = vec4( 255/255, 255/255, 255/255, 1.0);
+    materialSpecular = vec4( .1, .1, .1, 1.0 );
+    materialShiness = 0;
+    SetupLightMat();
+	mvMatrixStack.push(modelViewMatrix);
+
+	//modelViewMatrix = mult(modelViewMatrix, translate(-0.5, 0, -0.5));
+	//modelViewMatrix = mult(modelViewMatrix, rotate(35, vec3(0, 1, 0)));
+	gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
+  
+	mvMatrixStack.push(modelViewMatrix);
+	//modelViewMatrix = mult(modelViewMatrix, translate(0.0, 2.2, 0.0));
+	drawCone(undefined, [90, vec3(0.0, 0.0, 1.0)]);
+	drawCylinder([1.95,-.27,1], [-90, vec3(1.0, 0.0, 0.0)], [.5, 0.25, .5]);
+	modelViewMatrix = mvMatrixStack.pop();
+  
+	//drawCylinder([0.0, 2.95, -2.5], undefined, [1, 1, 0.4]);
+	//drawCylinder([0.0, 1.0, 0.0], [-90, vec3(1.0, 0.0, 0.0)]);
+	//drawCone([0.15, 0.0, -1.0], [90, vec3(0.0, 0.0, 1.0)]);
+	modelViewMatrix = mvMatrixStack.pop();
+}
+
+function drawCone(
+	translation = [0, 0, 0],
+	rotation = [0, vec4(0.0, 0.0, 0.0)],
+	scaling = [1.0, 1.0, 1.0]
+  ) {
+	materialAmbient = vec4( .2, .2, .2, 1.0 );
+    materialDiffuse = vec4( 255/255, 255/255, 255/255, 1.0);
+    materialSpecular = vec4( .1, .1, .1, 1.0 );
+    materialShiness = 0;
+    SetupLightMat();
+	mvMatrixStack.push(modelViewMatrix);
+	modelViewMatrix = mult(modelViewMatrix, scale4(.25,.25,.25));
+	modelViewMatrix = mult(modelViewMatrix, rotate(...rotation));
+	modelViewMatrix = mult(modelViewMatrix, translate(1,-4,.75));
+	gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
+	gl.drawArrays(gl.TRIANGLE_STRIP, 15224, NUM_CONE_POINTS);
+	currPointNum += NUM_CONE_POINTS;
+  
+	modelViewMatrix = mvMatrixStack.pop();
+}
+
+function drawCylinder(
+	translation = [0, 0, 0],
+	rotation = [0, vec4(0.0, 0.0, 0.0)],
+	scaling = [1.0, 1.0, 1.0]
+  ) {
+	materialAmbient = vec4( .2, .2, .2, 1.0 );
+    materialDiffuse = vec4( 255/255, 255/255, 255/255, 1.0);
+    materialSpecular = vec4( .1, .1, .1, 1.0 );
+    materialShiness = 0;
+    SetupLightMat();
+	mvMatrixStack.push(modelViewMatrix);
+  
+	modelViewMatrix = mult(modelViewMatrix, scale4(...scaling));
+	modelViewMatrix = mult(modelViewMatrix, rotate(...rotation));
+	modelViewMatrix = mult(modelViewMatrix, translate(...translation));
+	console.log(pointsArray)
+	gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
+	gl.drawArrays(gl.TRIANGLES, 14024, NUM_CYLINDER_POINTS);
+	currPointNum += NUM_CYLINDER_POINTS;
+  
+	modelViewMatrix = mvMatrixStack.pop();
+}
+
+
 
 function render()
 {
@@ -682,6 +760,14 @@ function render()
 	{
 		mvMatrixStack.push(modelViewMatrix);
 		DrawPicFrame();
+		modelViewMatrix=mvMatrixStack.pop();
+	}
+
+
+	// Floor Lamp
+	{
+		mvMatrixStack.push(modelViewMatrix);
+		DrawFloorLamp();
 		modelViewMatrix=mvMatrixStack.pop();
 	}
 	
@@ -998,3 +1084,92 @@ function Newell(indices)
 
    return (normalize(vec3(x, y, z)));
 }
+
+
+function generateConePoints(coneR1, coneR2, coneHeight, coneColor) {
+	let Phi = 0,
+	  dPhi = 2 * Math.PI / (nPhi - 1);
+	let Nx = coneR1 - coneR2;
+	let Ny = coneHeight;
+	let N = Math.sqrt(Nx * Nx + Ny * Ny);
+  
+	Nx /= N;
+	Ny /= N;
+  
+	for (let i = 0; i < nPhi; i++) {
+	  const cosPhi = Math.cos(Phi);
+	  const sinPhi = Math.sin(Phi);
+	  const cosPhi2 = Math.cos(Phi + dPhi / 2);
+	  const sinPhi2 = Math.sin(Phi + dPhi / 2);
+  
+	  pointsArray.push(vec4(-coneHeight / 2, cosPhi * coneR1, sinPhi * coneR1, 1.0));
+	  pointsArray.push(vec4(coneHeight / 2, cosPhi2 * coneR2, sinPhi2 * coneR2, 1.0));
+  
+	  Phi += dPhi;
+	}
+}
+
+function genenerateCylinderPoints(
+	center,
+	pA,
+	pB,
+	radius,
+	sideColor,
+	faceColor
+  ) {
+	const angle = 2 * Math.PI / cylinderSize;
+  
+	for (let i = 0; i < cylinderSize + 1; i++) {
+	  const x = center[0] + radius * Math.cos(i * angle);
+	  const y = center[1] + radius * Math.sin(i * angle);
+  
+	  // Cylinder halves
+	  cylinderVertB.push(vec4(x, y, 0.0, 1.0));
+	  cylinderVertA.push(vec4(x, y, 3.0, 1.0));
+	}
+  
+	generateCylinderFaces(pA, pB, sideColor, faceColor);
+}
+  
+function generateCylinderFaces(pA, pB, sideColor, faceColor) {
+	// Lower face
+	// let t1 = subtract(circleTwoVert[1], circleTwoVert[0]);
+	// let t2 = subtract(pA, circleTwoVert[1]);
+	for (let i = 0; i < cylinderSize; i++) {
+	  pointsArray.push(pA);
+	  pointsArray.push(cylinderVertB[i]);
+	  pointsArray.push(cylinderVertB[i + 1]);
+  
+	  currCylinderPoint += 3;
+	  
+	}
+  
+	// Upper face
+	// t1 = subtract(circleOneVert[1], circleOneVert[0]);
+	// t2 = subtract(pB, circleOneVert[1]);
+	for (let i = 0; i < cylinderSize; i++) {
+	  pointsArray.push(pB);
+	  pointsArray.push(cylinderVertA[i]);
+	  pointsArray.push(cylinderVertA[i + 1]);
+  
+	  currCylinderPoint += 3;
+	}
+  
+	for (let i = 0; i < cylinderSize; i++) {
+	  generateCylinderSides(i, i + 1, i + 1, i, sideColor);
+	}
+  
+	cylinderVertA = [];
+	cylinderVertB = [];
+}
+
+function generateCylinderSides(a, b, c, d, sideColor) {
+	pointsArray.push(cylinderVertA[a]);
+	pointsArray.push(cylinderVertA[b]);
+	pointsArray.push(cylinderVertB[c]);
+	pointsArray.push(cylinderVertA[a]);
+	pointsArray.push(cylinderVertB[c]);
+	pointsArray.push(cylinderVertB[d]);
+  
+	currCylinderPoint += 6;
+  }
