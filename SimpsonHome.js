@@ -490,6 +490,40 @@ function DrawRug() {
 }
 
 
+function DrawPicFrame() {
+
+	// Draw Border
+	materialAmbient = vec4( .2, .2, .2, 1.0 );
+    materialDiffuse = vec4( 244/255, 128/255, 55/255, 1.0);
+    materialSpecular = vec4( .1, .1, .1, 1.0 );
+    materialShiness = 0;
+    SetupLightMat();
+	mvMatrixStack.push(modelViewMatrix);
+	s = scale4(0.35, .25, 0.05);
+	modelViewMatrix = mult(modelViewMatrix, s);
+	t=translate(1.4, 4.0, 1); 
+    modelViewMatrix = mult(modelViewMatrix, t);
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
+    gl.drawArrays( gl.TRIANGLES, 0, 36);
+	modelViewMatrix = mvMatrixStack.pop();
+
+	// Draw Sky
+	materialAmbient = vec4( .2, .2, .2, 1.0 );
+    materialDiffuse = vec4( 55/255, 164/255, 246/255, 1.0);
+    materialSpecular = vec4( .1, .1, .1, 1.0 );
+    materialShiness = 0;
+    SetupLightMat();
+	mvMatrixStack.push(modelViewMatrix);
+	s = scale4(0.25, .2, 0.01);
+	modelViewMatrix = mult(modelViewMatrix, s);
+	t=translate(2, 5.1, 10); 
+    modelViewMatrix = mult(modelViewMatrix, t);
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
+    gl.drawArrays( gl.TRIANGLES, 0, 36);
+	modelViewMatrix = mvMatrixStack.pop();
+
+}
+
 function render()
 {
 	materialAmbient = vec4( .2, .2, .2, 1.0 );
@@ -578,6 +612,13 @@ function render()
 	{
 		mvMatrixStack.push(modelViewMatrix);
 		DrawRug();
+		modelViewMatrix=mvMatrixStack.pop();
+	}
+
+	// Pic Frame
+	{
+		mvMatrixStack.push(modelViewMatrix);
+		DrawPicFrame();
 		modelViewMatrix=mvMatrixStack.pop();
 	}
 	
