@@ -609,17 +609,19 @@ function DrawFloorLamp() {
   
 	mvMatrixStack.push(modelViewMatrix);
 	//modelViewMatrix = mult(modelViewMatrix, translate(0.0, 2.2, 0.0));
-	drawCone(undefined, [90, vec3(0.0, 0.0, 1.0)]);
-	drawCylinder([1.95,-.27,1], [-90, vec3(1.0, 0.0, 0.0)], [.5, 0.25, .5]);
+	drawCone(15224,[1,-4,.75], [90, vec3(0.0, 0.0, 1.0)], [.25,.25,.25]);
+	drawCylinder(14024,[1.95,-.27,1], [-90, vec3(1.0, 0.0, 0.0)], [.5, 0.25, .5]);
 	modelViewMatrix = mvMatrixStack.pop();
   
-	//drawCylinder([0.0, 2.95, -2.5], undefined, [1, 1, 0.4]);
+	drawCylinder(14624,[3.85, 9.95, 1], undefined, [.25,.1, .08]);
 	//drawCylinder([0.0, 1.0, 0.0], [-90, vec3(1.0, 0.0, 0.0)]);
-	//drawCone([0.15, 0.0, -1.0], [90, vec3(0.0, 0.0, 1.0)]);
+	//drawCone(15224,[2, -1.0, 1], [90, vec3(0.0, 0.0, 1.0)], [.25, 0.25, .5]);
+	drawCone(13224,[4,-4,1.25], [90, vec3(0.0, 0.0, 1.0)], [.25,.25,.25]);
 	modelViewMatrix = mvMatrixStack.pop();
 }
 
 function drawCone(
+	pointNum,
 	translation = [0, 0, 0],
 	rotation = [0, vec4(0.0, 0.0, 0.0)],
 	scaling = [1.0, 1.0, 1.0]
@@ -630,17 +632,18 @@ function drawCone(
     materialShiness = 0;
     SetupLightMat();
 	mvMatrixStack.push(modelViewMatrix);
-	modelViewMatrix = mult(modelViewMatrix, scale4(.25,.25,.25));
+	modelViewMatrix = mult(modelViewMatrix, scale4(...scaling));
 	modelViewMatrix = mult(modelViewMatrix, rotate(...rotation));
-	modelViewMatrix = mult(modelViewMatrix, translate(1,-4,.75));
+	modelViewMatrix = mult(modelViewMatrix, translate(...translation));
 	gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
-	gl.drawArrays(gl.TRIANGLE_STRIP, 15224, NUM_CONE_POINTS);
+	gl.drawArrays(gl.TRIANGLE_STRIP, pointNum, NUM_CONE_POINTS);
 	currPointNum += NUM_CONE_POINTS;
   
 	modelViewMatrix = mvMatrixStack.pop();
 }
 
 function drawCylinder(
+	pointNum,
 	translation = [0, 0, 0],
 	rotation = [0, vec4(0.0, 0.0, 0.0)],
 	scaling = [1.0, 1.0, 1.0]
@@ -655,9 +658,8 @@ function drawCylinder(
 	modelViewMatrix = mult(modelViewMatrix, scale4(...scaling));
 	modelViewMatrix = mult(modelViewMatrix, rotate(...rotation));
 	modelViewMatrix = mult(modelViewMatrix, translate(...translation));
-	console.log(pointsArray)
 	gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
-	gl.drawArrays(gl.TRIANGLES, 14024, NUM_CYLINDER_POINTS);
+	gl.drawArrays(gl.TRIANGLES, pointNum, NUM_CYLINDER_POINTS);
 	currPointNum += NUM_CYLINDER_POINTS;
   
 	modelViewMatrix = mvMatrixStack.pop();
