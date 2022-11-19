@@ -44,6 +44,10 @@ let currPointNum = 15224;
 var circleOneVert = [];
 var circleTwoVert = [];
 
+let PHONE_ANIMATED = false;
+const ORIGINAL_PHONE_POS = [0,0,0]
+let CURR_PHONE_RECEIVE_POS = ORIGINAL_PHONE_POS
+let PHONE_ANIMATE_DOWN = false
 // Sofa
 var sofaVerts = [
 	vec4( 0, 0, 0, 1),			//A(0)
@@ -260,6 +264,15 @@ window.onload = function init()
 
     // keyboard handle
     //window.onkeydown = HandleKeyboard;
+  	// a
+	window.addEventListener("keydown", function () {
+		if (event.keyCode == 65) {
+			PHONE_ANIMATED = true
+			PHONE_ANIMATE_DOWN = false
+		}
+	});
+
+
 
     render();
 }
@@ -419,7 +432,7 @@ function DrawTable(topWid, topThick, legThick, legLen)
 	modelViewMatrix=mvMatrixStack.pop();
 }
 
-function DrawCylinder(scaleX, scaleY, scaleZ, turn){
+function DrawCylinder(scaleX, scaleY, scaleZ, turn, phoneReceiveTranslate = [0,0,0]){
 
 	var CylPos = cubeCount + sphereCount;
 
@@ -435,6 +448,8 @@ function DrawCylinder(scaleX, scaleY, scaleZ, turn){
 
     s = scale4(scaleX, scaleY, scaleZ);
     modelViewMatrix = mult(modelViewMatrix, s);
+
+	modelViewMatrix = mult(modelViewMatrix, translate(...phoneReceiveTranslate))
 
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
 
@@ -731,7 +746,7 @@ function DrawPhoneBase()
 	
 }
 
-function DrawPhoneReceive()
+function DrawPhoneReceive(phoneReceivePos = [0,0,0])
 {
 	// Receiver
 	materialAmbient = vec4( .2, .2, .2, 1.0 );
@@ -747,7 +762,7 @@ function DrawPhoneReceive()
 	modelViewMatrix=mult(modelViewMatrix, t);
 	r=rotate(180.0, 90.0, 90.0, 1.0);
     modelViewMatrix=mult(modelViewMatrix, r);
-	DrawCylinder(0.05, 0.05, 0.05, true);
+	DrawCylinder(0.05, 0.05, 0.05, true, phoneReceivePos);
 	modelViewMatrix=mvMatrixStack.pop();
 
 	mvMatrixStack.push(modelViewMatrix);
@@ -757,7 +772,7 @@ function DrawPhoneReceive()
 	modelViewMatrix=mult(modelViewMatrix, t);
 	r=rotate(180.0, 90.0, 90.0, 1.0);
     modelViewMatrix=mult(modelViewMatrix, r);
-	DrawCylinder(0.05, 0.05, 0.05, true);
+	DrawCylinder(0.05, 0.05, 0.05, true, phoneReceivePos);
 	modelViewMatrix=mvMatrixStack.pop();
 
 	mvMatrixStack.push(modelViewMatrix);
@@ -767,7 +782,7 @@ function DrawPhoneReceive()
 	modelViewMatrix=mult(modelViewMatrix, t);
 	r=rotate(180.0, 90.0, 90.0, 1.0);
     modelViewMatrix=mult(modelViewMatrix, r);
-	DrawCylinder(0.05, 0.05, 0.05, true);
+	DrawCylinder(0.05, 0.05, 0.05, true, phoneReceivePos);
 	modelViewMatrix=mvMatrixStack.pop();
 }
 
@@ -880,9 +895,25 @@ function render()
 		mvMatrixStack.push(modelViewMatrix);
 		DrawPhoneBase();
 		modelViewMatrix=mvMatrixStack.pop();
+		if (PHONE_ANIMATED) {
+			const [x,y, z] = CURR_PHONE_RECEIVE_POS
+			CURR_PHONE_RECEIVE_POS = [x-0.1,y,z]
+			if (CURR_PHONE_RECEIVE_POS[0] < -6) {
+				PHONE_ANIMATE_DOWN = true
+			}
+			if (PHONE_ANIMATE_DOWN) {
+				CURR_PHONE_RECEIVE_POS = [x+0.1,y,z]
+			}
+			if (CURR_PHONE_RECEIVE_POS[0] > 0) {
+				PHONE_ANIMATED = false
+			}
+		}
+		else {
+			CURR_PHONE_RECEIVE_POS = ORIGINAL_PHONE_POS
+		}
 
 		mvMatrixStack.push(modelViewMatrix);
-		DrawPhoneReceive();
+		DrawPhoneReceive(CURR_PHONE_RECEIVE_POS);
 		modelViewMatrix=mvMatrixStack.pop();
 	}
 
