@@ -1,7 +1,12 @@
+// Students: Zachary Kent & Pierce Patrick
+// Project 4 (Part II): Simpson Home
+// Due Nov. 22nd
+
 var program;
 var canvas;
 var gl;
 
+//1.2 & -0.2
 var zoomFactor = 1.2;
 var translateFactorX = -0.2;
 var translateFactorY = 0.0;
@@ -32,6 +37,9 @@ var rugHalfCircleCount = 132;
 var pointTrack = 0;
 var flag = true;
 
+var N;
+var vertices1 = [];
+
 const NUM_CONE_POINTS = 200;
 const NUM_CYLINDER_POINTS = 600;
 let currCylinderPoint = 0;
@@ -48,6 +56,7 @@ let PHONE_ANIMATED = false;
 const ORIGINAL_PHONE_POS = [0,0,0]
 let CURR_PHONE_RECEIVE_POS = ORIGINAL_PHONE_POS
 let PHONE_ANIMATE_DOWN = false
+
 // Sofa
 var sofaVerts = [
 	vec4( 0, 0, 0, 1),			//A(0)
@@ -150,6 +159,62 @@ function BuildPhone()
 	quadP( 5, 4, 0, 1 );
 }
 
+// Lampshade
+// Z stays untouched
+var shadeVerts = [
+	[0.06,  0.0, 0.0],
+	[0.065, 0.0, 0.0],
+	[0.065, 0.005, 0.0],
+	[0.06,  0.005, 0.0],
+	[0.1,   0.15, 0.0],
+	[0.102, 0.15, 0.0],
+	[0.102, 0.155, 0.0],
+	[0.05,  0.005, 0.0],
+	[0.06,  0.0, 0.0],
+	];
+
+function SurfaceRevPoints()
+{
+  	//Setup initial points matrix
+  	for (var i = 0; i < 9; i++)
+  	{
+    	vertices1.push(vec4(-1*shadeVerts[i][0], shadeVerts[i][1], 
+						shadeVerts[i][2], 1));
+  	}
+
+	for (var i = 0; i < 9; i++)
+  	{
+    	vertices1.push(vec4(-1*shadeVerts[i][0], shadeVerts[i][1], 
+						shadeVerts[i][2], 1));
+  	}
+
+  	var r;
+	var t=Math.PI/8;
+
+	// sweep the original curve another "angle" degree
+  	for (var j = 0; j < 17; j++)
+  	{
+        var angle = (j+1)*t; 
+
+    	// for each sweeping step, generate 18 new points corresponding to the original points
+    	for(var i = 0; i < 18; i++ )
+    	{
+            r = vertices1[i][0];
+            vertices1.push(vec4(r*Math.cos(angle), vertices1[i][1], -r*Math.sin(angle), 1));
+    	}
+  	}
+
+       var N=18; 
+       // quad strips are formed slice by slice (not layer by layer)
+       for (var i=0; i < 17; i++) // slices
+       {
+           for (var j=0; j < 17; j++)  // layers
+           {
+    			quadL(i*N+j, (i+1)*N+j, (i+1)*N+(j+1), i*N+(j+1)); 
+           }
+       }    
+}
+
 // Cube
 var vertices = [
         vec4( -0.5, -0.5,  0.5, 1.0 ),
@@ -208,6 +273,7 @@ window.onload = function init()
 	CylinderPoints();	//600
 	BuildSofa();		//84 points
 	BuildPhone();		//36 points
+	SurfaceRevPoints();	//1734 points
 
 	// Build Rug Points 
     HalfCircle();		//132 points
@@ -228,9 +294,6 @@ window.onload = function init()
 	// Lamp base
 	generateConePoints(0.75, 0.1, 0.3, barColor);
 						//200 points
-
-	// Phone base
-	//BuildPhone();		//36 points
 
     // pass data onto GPU
     var nBuffer = gl.createBuffer();
@@ -264,15 +327,12 @@ window.onload = function init()
 
     // keyboard handle
     //window.onkeydown = HandleKeyboard;
-  	// a
 	window.addEventListener("keydown", function () {
 		if (event.keyCode == 65) {
 			PHONE_ANIMATED = true
 			PHONE_ANIMATE_DOWN = false
 		}
 	});
-
-
 
     render();
 }
@@ -309,11 +369,11 @@ function DrawSolidSphere(radius)
 			pointTrack += 3;
 		}
 
-		while (flag)
+		/*while (flag)
 		{
 			console.log("Tracker says " + pointTrack);
 			flag = false;
-		}
+		}*/
 
 	modelViewMatrix=mvMatrixStack.pop();
 }
@@ -548,7 +608,8 @@ function DrawSofa()
 }
 
 function DrawRug() {
-	var rugPos = 13128;
+	var rugPos = 14862;
+	//13128 originally
 
 	materialAmbient = vec4( .2, .2, .2, 1.0 );
     materialDiffuse = vec4( 244/255, 128/255, 55/255, 1.0);
@@ -653,27 +714,29 @@ function DrawPicFrame() {
 
 function DrawFloorLamp() {
 	materialAmbient = vec4( .2, .2, .2, 1.0 );
-    materialDiffuse = vec4( 255/255, 255/255, 255/255, 1.0);
+    materialDiffuse = vec4( 208/255, 100/255, 208/255, 1.0);
     materialSpecular = vec4( .1, .1, .1, 1.0 );
-    materialShiness = 0;
+    materialShiness = 50;
     SetupLightMat();
 	mvMatrixStack.push(modelViewMatrix);
 
-	//modelViewMatrix = mult(modelViewMatrix, translate(-0.5, 0, -0.5));
-	//modelViewMatrix = mult(modelViewMatrix, rotate(35, vec3(0, 1, 0)));
 	gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
   
 	mvMatrixStack.push(modelViewMatrix);
-	//modelViewMatrix = mult(modelViewMatrix, translate(0.0, 2.2, 0.0));
-	drawCone(15260,[1,-4,.75], [90, vec3(0.0, 0.0, 1.0)], [.25,.25,.25]);
-	drawCylinder(14060,[1.95,-.27,1], [-90, vec3(1.0, 0.0, 0.0)], [.5, 0.25, .5]);
+	drawCone(16994,[1,-4,.75], [90, vec3(0.0, 0.0, 1.0)], [.25,.25,.25]);			// Base
+	drawCylinder(15794,[1.95,-.27,1], [-90, vec3(1.0, 0.0, 0.0)], [.5, 0.25, .5]);	// Main Pole
 	modelViewMatrix = mvMatrixStack.pop();
+
+	materialAmbient = vec4( .2, .2, .2, 1.0 );
+    materialDiffuse = vec4( 196/255, 202/255, 206/255, 1.0);
+    materialSpecular = vec4( .1, .1, .1, 1.0 );
+    materialShiness = 0;
+    SetupLightMat();
   
-	drawCylinder(14660,[3.85, 9.95, 1], undefined, [.25,.1, .08]);
-	//drawCylinder([0.0, 1.0, 0.0], [-90, vec3(1.0, 0.0, 0.0)]);
-	//drawCone(15224,[2, -1.0, 1], [90, vec3(0.0, 0.0, 1.0)], [.25, 0.25, .5]);
-	drawCone(13260,[4,-4,1.25], [90, vec3(0.0, 0.0, 1.0)], [.25,.25,.25]);
+	drawCylinder(15194,[3.85, 9.95, 1], undefined, [.25,.1, .08]);					// Shade Holder
 	modelViewMatrix = mvMatrixStack.pop();
+
+	lightPosition = vec4(-2, 1, 1, 0 );
 }
 
 function drawCone(
@@ -682,11 +745,6 @@ function drawCone(
 	rotation = [0, vec4(0.0, 0.0, 0.0)],
 	scaling = [1.0, 1.0, 1.0]
   ) {
-	materialAmbient = vec4( .2, .2, .2, 1.0 );
-    materialDiffuse = vec4( 255/255, 255/255, 255/255, 1.0);
-    materialSpecular = vec4( .1, .1, .1, 1.0 );
-    materialShiness = 0;
-    SetupLightMat();
 	mvMatrixStack.push(modelViewMatrix);
 	modelViewMatrix = mult(modelViewMatrix, scale4(...scaling));
 	modelViewMatrix = mult(modelViewMatrix, rotate(...rotation));
@@ -704,11 +762,6 @@ function drawCylinder(
 	rotation = [0, vec4(0.0, 0.0, 0.0)],
 	scaling = [1.0, 1.0, 1.0]
   ) {
-	materialAmbient = vec4( .2, .2, .2, 1.0 );
-    materialDiffuse = vec4( 255/255, 255/255, 255/255, 1.0);
-    materialSpecular = vec4( .1, .1, .1, 1.0 );
-    materialShiness = 0;
-    SetupLightMat();
 	mvMatrixStack.push(modelViewMatrix);
   
 	modelViewMatrix = mult(modelViewMatrix, scale4(...scaling));
@@ -740,10 +793,46 @@ function DrawPhoneBase()
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
 	
     gl.drawArrays( gl.TRIANGLES, phonePos, 36);
-
 	modelViewMatrix=mvMatrixStack.pop();
 
-	
+	materialAmbient = vec4( .2, .2, .2, 1.0 );
+    materialDiffuse = vec4( 244/255, 244/255, 244/255, 1.0);
+    materialSpecular = vec4( .1, .1, .1, 1.0 );
+    materialShiness = 0;
+    SetupLightMat();
+
+	for (let i = -0.08; i > -0.14; i += -0.02)
+	{
+		mvMatrixStack.push(modelViewMatrix);
+		t=translate(i, 0.315, 0.075); 
+    	modelViewMatrix = mult(modelViewMatrix, t);
+		r=rotate(45, 45, 0, 1.0);
+		modelViewMatrix = mult(modelViewMatrix, r);
+		DrawSolidCube(0.011);
+		modelViewMatrix=mvMatrixStack.pop();
+	}
+
+	for (let i = -0.096; i > -0.146; i += -0.02)
+	{
+		mvMatrixStack.push(modelViewMatrix);
+		t=translate(i, 0.268, 0.045); 
+    	modelViewMatrix = mult(modelViewMatrix, t);
+		r=rotate(45, 45, 0, 1.0);
+		modelViewMatrix = mult(modelViewMatrix, r);
+		DrawSolidCube(0.01);
+		modelViewMatrix=mvMatrixStack.pop();
+	}
+
+	for (let i = -0.110; i > -0.160; i += -0.02)
+	{
+		mvMatrixStack.push(modelViewMatrix);
+		t=translate(i, 0.221, 0.015); 
+    	modelViewMatrix = mult(modelViewMatrix, t);
+		r=rotate(45, 45, 0, 1.0);
+		modelViewMatrix = mult(modelViewMatrix, r);
+		DrawSolidCube(0.012);
+		modelViewMatrix=mvMatrixStack.pop();
+	}
 }
 
 function DrawPhoneReceive(phoneReceivePos = [0,0,0])
@@ -786,6 +875,21 @@ function DrawPhoneReceive(phoneReceivePos = [0,0,0])
 	modelViewMatrix=mvMatrixStack.pop();
 }
 
+function DrawLampshade(xlength,ylength,zlength)
+{
+  	mvMatrixStack.push(modelViewMatrix);
+  	r=rotate(180,1,0,0);
+  	s=scale4(xlength, ylength, zlength );   // scale to the given radius
+	modelViewMatrix = mult(modelViewMatrix,r);
+	modelViewMatrix = mult(modelViewMatrix,s);
+	//modelViewMatrix = mult(mult(mult(modelViewMatrix,t),r), s);
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
+  
+    gl.drawArrays( gl.TRIANGLES, 13128, 1734);
+
+  	modelViewMatrix=mvMatrixStack.pop();
+}
+
 function render()
 {
 	materialAmbient = vec4( .2, .2, .2, 1.0 );
@@ -813,6 +917,26 @@ function render()
     	modelViewMatrix = mult(modelViewMatrix, s);
 		DrawTableLamp();
 		modelViewMatrix=mvMatrixStack.pop();
+
+		// Lampshade
+		{
+			lightPosition = vec4(-0.21, 0.475, -0.15, 0 );
+			materialAmbient = vec4( .2, .2, .2, 1.0 );
+    		materialDiffuse = vec4( 238/255, 100/255, 238/255, 1.0);
+    		materialSpecular = vec4( .1, .1, .1, 1.0 );
+	    	materialShiness = 50;
+   			SetupLightMat();
+
+			mvMatrixStack.push(modelViewMatrix);
+			t=translate(-0.21, 0.475, -0.15);
+    	  	modelViewMatrix=mult(modelViewMatrix,t);
+      	
+			gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
+	        DrawLampshade(0.75, 0.75, 0.75);
+  			modelViewMatrix=mvMatrixStack.pop();
+
+			lightPosition = vec4(-2, 1, 1, 0 );
+		}
 	}
 
 	// Sofa
@@ -888,6 +1012,28 @@ function render()
 		mvMatrixStack.push(modelViewMatrix);
 		DrawFloorLamp();
 		modelViewMatrix=mvMatrixStack.pop();
+
+		// Lampshade
+		{
+			lightPosition = vec4(0.7, 1.0, 0.4, 0 );
+			materialAmbient = vec4( .2, .2, .2, 1.0 );
+    		materialDiffuse = vec4( 244/255, 128/255, 55/255, 1.0);
+    		materialSpecular = vec4( .1, .1, .1, 1.0 );
+	    	materialShiness = 0;
+   			SetupLightMat();
+
+			mvMatrixStack.push(modelViewMatrix);
+			t=translate(0.975, 1.0, 0.325);
+    	  	modelViewMatrix=mult(modelViewMatrix,t);
+			r = rotate(40, -35, -25, 1.0);
+			modelViewMatrix=mult(modelViewMatrix,r);
+      	
+			gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
+	        DrawLampshade(1.25, 1.25, 1.25);
+  			modelViewMatrix=mvMatrixStack.pop();
+
+			lightPosition = vec4(-2, 1, 1, 0 );
+		}
 	}
 
 	// Phone
@@ -895,6 +1041,7 @@ function render()
 		mvMatrixStack.push(modelViewMatrix);
 		DrawPhoneBase();
 		modelViewMatrix=mvMatrixStack.pop();
+
 		if (PHONE_ANIMATED) {
 			const [x,y, z] = CURR_PHONE_RECEIVE_POS
 			CURR_PHONE_RECEIVE_POS = [x-0.1,y,z]
@@ -1030,6 +1177,38 @@ function quadP(a, b, c, d)
      	normalsArray.push(normal);
      	pointsArray.push(phoneVerts[d]);
      	normalsArray.push(normal);
+}
+
+function quadL(a, b, c, d) {
+
+	var indices=[a, b, c, d];
+	var normal = NewellL(indices);
+
+	// triangle a-b-c
+	pointsArray.push(vertices1[a]); 
+	normalsArray.push(normal); 
+	//texCoordsArray.push(texCoord[0]);
+
+	pointsArray.push(vertices1[b]); 
+	normalsArray.push(normal); 
+	//texCoordsArray.push(texCoord[1]); 
+
+	pointsArray.push(vertices1[c]); 
+	normalsArray.push(normal);   
+	//texCoordsArray.push(texCoord[2]); 
+
+	// triangle a-c-d
+	pointsArray.push(vertices1[a]);  
+	normalsArray.push(normal); 
+	//texCoordsArray.push(texCoord[0]); 
+
+	pointsArray.push(vertices1[c]); 
+	normalsArray.push(normal); 
+	//texCoordsArray.push(texCoord[2]); 
+
+	pointsArray.push(vertices1[d]); 
+	normalsArray.push(normal);    
+	//texCoordsArray.push(texCoord[3]);   
 }
 
 function colorCube()
@@ -1169,7 +1348,6 @@ function HalfCircle() {
     ExtrudedShape();
 }
 
-
 function ExtrudedShape()
 {
     var basePoints=[];
@@ -1199,7 +1377,6 @@ function ExtrudedShape()
     // add the top face
     polygon(topPoints);
 }
-
 
 function polygon(indices)
 {
@@ -1252,6 +1429,27 @@ function Newell(indices)
    return (normalize(vec3(x, y, z)));
 }
 
+function NewellL(indices)
+{
+   var L=indices.length;
+   var x=0, y=0, z=0;
+   var index, nextIndex;
+
+   for (var i=0; i<L; i++)
+   {
+       index=indices[i];
+       nextIndex = indices[(i+1)%L];
+       
+       x += (vertices1[index][1] - vertices1[nextIndex][1])*
+            (vertices1[index][2] + vertices1[nextIndex][2]);
+       y += (vertices1[index][2] - vertices1[nextIndex][2])*
+            (vertices1[index][0] + vertices1[nextIndex][0]);
+       z += (vertices1[index][0] - vertices1[nextIndex][0])*
+            (vertices1[index][1] + vertices1[nextIndex][1]);
+   }
+
+   return (normalize(vec3(x, y, z)));
+}
 
 function generateConePoints(coneR1, coneR2, coneHeight, coneColor) {
 	let Phi = 0,
