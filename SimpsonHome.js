@@ -714,6 +714,22 @@ function DrawPicFrame() {
 	modelViewMatrix = mvMatrixStack.pop();
 }
 
+function DrawPainting() {
+	materialAmbient = vec4( .2, .2, .2, 1.0 );
+    materialDiffuse = vec4( 75/255, 128/255, 75/255, 1.0);
+    materialSpecular = vec4( .1, .1, .1, 1.0 );
+    materialShiness = 0;
+    SetupLightMat();
+	mvMatrixStack.push(modelViewMatrix);
+	s = scale4(0.2, .25, 0.03);
+	modelViewMatrix = mult(modelViewMatrix, s);
+	t=translate(-.5, 4.0, 1); 
+    modelViewMatrix = mult(modelViewMatrix, t);
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
+    gl.drawArrays( gl.TRIANGLES, 0, 36);
+	modelViewMatrix = mvMatrixStack.pop();
+}
+
 function DrawFloorLamp() {
 	materialAmbient = vec4( .2, .2, .2, 1.0 );
     materialDiffuse = vec4( 208/255, 100/255, 208/255, 1.0);
@@ -1063,6 +1079,13 @@ function render()
 
 		mvMatrixStack.push(modelViewMatrix);
 		DrawPhoneReceive(CURR_PHONE_RECEIVE_POS);
+		modelViewMatrix=mvMatrixStack.pop();
+	}
+
+	// Painting
+	{
+		mvMatrixStack.push(modelViewMatrix);
+		DrawPainting();
 		modelViewMatrix=mvMatrixStack.pop();
 	}
 
