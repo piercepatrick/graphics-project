@@ -331,6 +331,8 @@ window.onload = function init()
 		if (event.keyCode == 65) {
 			PHONE_ANIMATED = true
 			PHONE_ANIMATE_DOWN = false
+			var audioElement = new Audio('telephone-ring-01a.wav')
+			audioElement.play();
 		}
 	});
 
