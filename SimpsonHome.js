@@ -1,6 +1,6 @@
 // Students: Zachary Kent & Pierce Patrick
-// Project 4 (Part II): Simpson Home
-// Due Nov. 22nd
+// Project 4 (Part III): Simpson Home
+// Due Dec. 6th
 
 var program;
 var canvas;
@@ -56,6 +56,28 @@ let PHONE_ANIMATED = false;
 const ORIGINAL_PHONE_POS = [0,0,0]
 let CURR_PHONE_RECEIVE_POS = ORIGINAL_PHONE_POS
 let PHONE_ANIMATE_DOWN = false
+
+var AllInfo = {
+
+    // Camera pan control variables.
+    zoomFactor : 1.2,
+    translateX : -0.2,
+    translateY : 0,
+
+    // Camera rotate control variables.
+    phi : 1,
+    theta : 0.5,
+    radius : 1,
+    dr : 2.0 * Math.PI/180.0,
+
+    // Mouse control variables
+    mouseDownRight : false,
+    mouseDownLeft : false,
+
+    mousePosOnClickX : 0,
+    mousePosOnClickY : 0
+};
+
 
 // Sofa
 var sofaVerts = [
@@ -335,6 +357,34 @@ window.onload = function init()
 			audioElement.play();
 		}
 	});
+
+
+    document.getElementById("gl-canvas").addEventListener("mousedown", function(e) {
+        if (e.which == 1) {
+            AllInfo.mouseDownLeft = true;
+            AllInfo.mousePosOnClickY = e.y;
+            AllInfo.mousePosOnClickX = e.x;
+        }
+        render();
+    });
+
+	document.addEventListener("mouseup", function(e) {
+        AllInfo.mouseDownLeft = false;
+        render();
+    });
+
+	document.addEventListener("mousemove", function(e) {
+
+        if (AllInfo.mouseDownLeft) {
+            AllInfo.phi += (e.x - AllInfo.mousePosOnClickX)/100;
+            AllInfo.mousePosOnClickX = e.x;
+
+            AllInfo.theta += (e.y - AllInfo.mousePosOnClickY)/100;
+            AllInfo.mousePosOnClickY = e.y;
+        }
+        render();
+    });
+
 
     render();
 }
@@ -921,7 +971,20 @@ function render()
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); 
 
    	// set up view and projection
-   	projectionMatrix = ortho(left*zoomFactor-translateFactorX, right*zoomFactor-translateFactorX, bottom*zoomFactor-translateFactorY, ytop*zoomFactor-translateFactorY, near, far);
+   	//projectionMatrix = ortho(left*zoomFactor-translateFactorX, right*zoomFactor-translateFactorX, bottom*zoomFactor-translateFactorY, ytop*zoomFactor-translateFactorY, near, far);
+
+
+    projectionMatrix = ortho( left*AllInfo.zoomFactor - AllInfo.translateX,
+                              right*AllInfo.zoomFactor - AllInfo.translateX,
+                              bottom*AllInfo.zoomFactor - AllInfo.translateY,
+                              ytop*AllInfo.zoomFactor - AllInfo.translateY,
+                              near, far);
+
+
+	eye = vec3( AllInfo.radius*Math.cos(AllInfo.phi),
+				AllInfo.radius*Math.sin(AllInfo.theta),
+				AllInfo.radius*Math.sin(AllInfo.phi));
+
    	modelViewMatrix=lookAt(eye, at, up);
  	gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
 	gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
