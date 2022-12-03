@@ -78,6 +78,7 @@ var AllInfo = {
     mousePosOnClickY : 0
 };
 
+startingPos = true;
 
 // Sofa
 var sofaVerts = [
@@ -370,6 +371,7 @@ window.onload = function init()
 
 	document.addEventListener("mouseup", function(e) {
         AllInfo.mouseDownLeft = false;
+		startingPos = false;
         render();
     });
 
@@ -384,6 +386,14 @@ window.onload = function init()
         }
         render();
     });
+
+	window.addEventListener("keydown", function () {
+		if (event.keyCode == 66) {
+			AllInfo.mouseDownLeft = false;
+			startingPos = true;
+			render();
+		}
+	});
 
 
     render();
@@ -984,7 +994,9 @@ function render()
 	eye = vec3( AllInfo.radius*Math.cos(AllInfo.phi),
 				AllInfo.radius*Math.sin(AllInfo.theta),
 				AllInfo.radius*Math.sin(AllInfo.phi));
-
+	if (startingPos) {
+		eye=[.3, .6, .6];
+	}
    	modelViewMatrix=lookAt(eye, at, up);
  	gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
 	gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
