@@ -12,8 +12,6 @@ var pointsArray = [];
 var normalsArray = [];
 var texCoordsArray = [];
 
-var textures = [];
-
 var left = -1;
 var right = 1;
 var ytop = 1;
@@ -37,11 +35,10 @@ var texCoord = [
     vec2(0, 0),
     vec2(0, 1),
     vec2(1, 1),
-
-    vec2(0,0),
-	vec2(1, 1),
-	vec2(1,0)
+	vec2(1, 0),
 ];
+
+var texture1, texture2, texture3, texture4, texture5, texture6, texture7, texture8, texture9;
 
 var N;
 var vertices1 = [];
@@ -66,16 +63,16 @@ let PHONE_ANIMATE_DOWN = false
 var AllInfo = {
 
     // Camera pan control variables.
-    zoomFactor : 1.2,
-    translateX : -0.2,
-    translateY : -0.0,
+    zoomFactor : 0.2999,
+    translateX : 0.1999,
+    translateY : -0.466,
     //zoom = 1.2
     //X = -0.2
     //Y =  0
 
     // Camera rotate control variables.
-    phi : 1.2,
-    theta:0.65,
+    phi : 2.659,
+    theta:0.99,
     radius : 1,
     dr : 2.0 * Math.PI/180.0,
     //phi = 1.2
@@ -323,9 +320,10 @@ window.onload = function init()
 	generateConePoints(0.75, 0.1, 0.3, barColor);							//200 points	
 
 	Initialize_Buffers();
-	openNewTexture("images/carpet.jpg");
-	openNewTexture("images/boat.jpg");
-  openNewTexture("images/couch.jpg");
+	Initialize_Textures();
+	//openNewTexture("images/boat.jpg");
+	//openNewTexture("images/couch.jpg");
+	//openNewTexture("images/carpet.jpg");
   
     modelViewMatrixLoc = gl.getUniformLocation( program, "modelViewMatrix" );
     projectionMatrixLoc = gl.getUniformLocation( program, "projectionMatrix" );
@@ -403,6 +401,7 @@ window.onload = function init()
         }
     });
 
+	console.log(pointsArray.length + "\n" + texCoordsArray.length);
 
     render();
 }
@@ -447,31 +446,171 @@ function Initialize_Buffers()
     gl.bindBuffer( gl.ARRAY_BUFFER, tBuffer );
     gl.bufferData( gl.ARRAY_BUFFER, flatten(texCoordsArray), gl.STATIC_DRAW );
 
-    var vTexCoord = gl.getAttribLocation( program, "vTexCoord" );		//Keeps giving -1*************
-    console.log("SHOULD NOT BE -1. But it is: " + vTexCoord);
+    var vTexCoord = gl.getAttribLocation( program, "vTexCoord" );
     gl.vertexAttribPointer( vTexCoord, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray( vTexCoord );
 }
 
-function openNewTexture(picName)
+function Initialize_Textures()
 {
-    var i = textures.length;
-    textures[i] = gl.createTexture();
-    textures[i].image = new Image();
-    textures[i].image.src = picName;
-    textures[i].image.onload = function() { loadNewTexture(i); }
+        // ------------ Setup Texture 1 -----------
+        texture1 = gl.createTexture();
+
+        // create the image object
+        texture1.image = new Image();
+  
+        // Enable texture unit 1
+        gl.activeTexture(gl.TEXTURE0);
+
+        //loadTexture
+        texture1.image.src='images/boat.jpg';
+
+        // register the event handler to be called on loading an image
+        texture1.image.onload = function() {  loadNewTexture(texture1, gl.TEXTURE0); }
+
+        // ------------ Setup Texture 2 -----------
+        texture2 = gl.createTexture();
+
+        // create the image object
+        texture2.image = new Image();
+  
+        // Enable texture unit 1
+        gl.activeTexture(gl.TEXTURE1);
+
+        //loadTexture
+        texture2.image.src='images/couch.jpg';
+
+        // register the event handler to be called on loading an image
+        texture2.image.onload = function() {  loadNewTexture(texture2, gl.TEXTURE1); }
+
+        // ------------ Setup Texture 3 -----------
+        texture3 = gl.createTexture();
+
+        // create the image object
+        texture3.image = new Image();
+  
+        // Enable texture unit 1
+        gl.activeTexture(gl.TEXTURE2);
+
+        //loadTexture
+        texture3.image.src='images/carpet.jpg';
+
+        // register the event handler to be called on loading an image
+        texture3.image.onload = function() {  loadNewTexture(texture3, gl.TEXTURE2); }
+
+		// ------------ Setup Texture 4 -----------
+        texture4 = gl.createTexture();
+
+        // create the image object
+        texture4.image = new Image();
+  
+        // Enable texture unit 1
+        gl.activeTexture(gl.TEXTURE3);
+
+        //loadTexture
+        texture4.image.src='images/Homer.jpg';
+
+        // register the event handler to be called on loading an image
+        texture4.image.onload = function() {  loadNewTexture(texture4, gl.TEXTURE3); }
+
+		// ------------ Setup Texture 5 -----------
+        texture5 = gl.createTexture();
+
+        // create the image object
+        texture5.image = new Image();
+  
+        // Enable texture unit 1
+        gl.activeTexture(gl.TEXTURE4);
+
+        //loadTexture
+        texture5.image.src='images/Marge.jpg';
+
+        // register the event handler to be called on loading an image
+        texture5.image.onload = function() {  loadNewTexture(texture5, gl.TEXTURE4); }
+
+		// ------------ Setup Texture 6 -----------
+        texture6 = gl.createTexture();
+
+        // create the image object
+        texture6.image = new Image();
+  
+        // Enable texture unit 1
+        gl.activeTexture(gl.TEXTURE5);
+
+        //loadTexture
+        texture6.image.src='images/Lisa.jpg';
+
+        // register the event handler to be called on loading an image
+        texture6.image.onload = function() {  loadNewTexture(texture6, gl.TEXTURE5); }
+
+		// ------------ Setup Texture 7 -----------
+        texture7 = gl.createTexture();
+
+        // create the image object
+        texture7.image = new Image();
+  
+        // Enable texture unit 1
+        gl.activeTexture(gl.TEXTURE6);
+
+        //loadTexture
+        texture7.image.src='images/Maggie.jpg';
+
+        // register the event handler to be called on loading an image
+        texture7.image.onload = function() {  loadNewTexture(texture7, gl.TEXTURE6); }
+
+		// ------------ Setup Texture 8 -----------
+        texture8 = gl.createTexture();
+
+        // create the image object
+        texture8.image = new Image();
+  
+        // Enable texture unit 1
+        gl.activeTexture(gl.TEXTURE7);
+
+        //loadTexture
+        texture8.image.src='images/Bart.jpg';
+
+        // register the event handler to be called on loading an image
+        texture8.image.onload = function() {  loadNewTexture(texture8, gl.TEXTURE7); }
+
+		// ------------ Setup Texture 9 -----------
+        texture9 = gl.createTexture();
+
+        // create the image object
+        texture9.image = new Image();
+  
+        // Enable texture unit 1
+        gl.activeTexture(gl.TEXTURE7);
+
+        //loadTexture
+        texture9.image.src='images/family.jpg';
+
+        // register the event handler to be called on loading an image
+        texture9.image.onload = function() {  loadNewTexture(texture9, gl.TEXTURE8); }
 }
 
-function loadNewTexture(index)
+function loadNewTexture(texture, whichTexture)
 {
+    // Flip the image's y axis
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-    gl.activeTexture(gl.TEXTURE0 + index);
-    gl.bindTexture(gl.TEXTURE_2D, textures[index]);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, textures[index].image);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.MIRRORED_REPEAT);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.MIRRORED_REPEAT);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+    // Enable texture unit 1
+    gl.activeTexture(whichTexture);
+
+    // bind the texture object to the target
+    gl.bindTexture( gl.TEXTURE_2D, texture);
+
+    // set the texture image
+    gl.texImage2D( gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, texture.image );
+
+    // v1 (combination needed for images that are not powers of 2
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+
+    // set the texture parameters
+    //gl.generateMipmap( gl.TEXTURE_2D );
+    gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST );
+    gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST );
 }
 
 // ******************************************
@@ -835,13 +974,60 @@ function DrawPicFrame() {
     materialShiness = 0;
     SetupLightMat();
 	mvMatrixStack.push(modelViewMatrix);
-	s = scale4(0.35, .25, 0.05);
+	s = scale4(0.35, .25, 0.03);
 	modelViewMatrix = mult(modelViewMatrix, s);
-	t=translate(1.05, 3, -4.4); 
+	t=translate(1.05, 3, -7.8); 
     modelViewMatrix = mult(modelViewMatrix, t);
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
     gl.drawArrays( gl.TRIANGLES, 0, 36);
 	modelViewMatrix = mvMatrixStack.pop();
+
+	gl.uniform1i(gl.getUniformLocation(program, "textureFlag"), 2);  // start using texture+
+
+	gl.uniform1i(gl.getUniformLocation(program, "texture"), 0);  // fragment shader to use gl.TEXTURE0
+	mvMatrixStack.push(modelViewMatrix);
+	s = scale4(0.34, .245, 0.03);
+	modelViewMatrix = mult(modelViewMatrix, s);
+	t=translate(1.08, 3.06, -7.75); 
+    modelViewMatrix = mult(modelViewMatrix, t);
+	r=rotate(180.0, 0.0, 0.0, 1.0);
+    modelViewMatrix=mult(modelViewMatrix, r);
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
+    gl.drawArrays( gl.TRIANGLES, 0, 36);
+	modelViewMatrix = mvMatrixStack.pop();
+}
+
+function DrawPainting() {
+
+	materialAmbient = vec4( .2, .2, .2, 1.0 );
+    materialDiffuse = vec4( 244/255, 128/255, 55/255, 1.0);
+    materialSpecular = vec4( .1, .1, .1, 1.0 );
+    materialShiness = 0;
+    SetupLightMat();
+
+	mvMatrixStack.push(modelViewMatrix);
+	s = scale4(0.35, .35, 0.03);
+	modelViewMatrix = mult(modelViewMatrix, s);
+	t=translate(-0.5, 2.5, -7.8); 
+    modelViewMatrix = mult(modelViewMatrix, t);
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
+    gl.drawArrays( gl.TRIANGLES, 0, 36);
+	modelViewMatrix = mvMatrixStack.pop();
+
+	gl.uniform1i(gl.getUniformLocation(program, "textureFlag"), 2);  // start using texture+
+	gl.uniform1i(gl.getUniformLocation(program, "texture"), 8);  // fragment shader to use gl.TEXTURE0
+	// Family
+	{
+		mvMatrixStack.push(modelViewMatrix);
+		s = scale4(0.349, .33, 0.01);
+		modelViewMatrix = mult(modelViewMatrix, s);
+		t=translate(-.5, 2.65, -22.3); 
+    	modelViewMatrix = mult(modelViewMatrix, t);
+    	gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
+    	gl.drawArrays( gl.TRIANGLES, 0, 36);
+		modelViewMatrix = mvMatrixStack.pop();
+	}
+
 }
 
 function DrawFloorLamp() {
@@ -1053,50 +1239,11 @@ function render()
  	gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
 	gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
 
-	//gl.uniform1i(gl.getUniformLocation(program, "textureFlag"), 0);  // stop using texture
-
 	materialAmbient = vec4( .2, .2, .2, 1.0 );
     materialDiffuse = vec4( 0.8, 0.8, 0.8, 1.0);
     materialSpecular = vec4( 1, 1, 1, 1.0 );
     materialShiness = 50;
     SetupLightMat();
-
-	gl.uniform1i(gl.getUniformLocation(program, "textureFlag"), 2);  // start using texture
-
-	gl.uniform1i(gl.getUniformLocation(program, "texture"), 1);  // fragment shader to use gl.TEXTURE0
-
-	// Walls & Floor
-	{
-		// floor: wall in xz-plane
-		lightPosition = vec4(-0.11, 0.475, -0.15, -2 );
-		materialAmbient = vec4( .1,.1,.1,.1 );
-    	materialDiffuse = vec4( 0/255, 246/255, 202/255, 1.0);
-    	materialSpecular = vec4( 0,0,0,1 );
-    	materialShiness = 0;
-    	SetupLightMat();
-
-		DrawWall(0.02, 0); 
-	
-		lightPosition = vec4(-0.21, 0.475, -0.15, 0 );
-		// wall #2: in yz-plane
-		materialAmbient = vec4( 1.75, 1.75, 1.75, 1.0 );
-    	materialDiffuse = vec4( 255/255, 145/255, 164/255, 1.0);
-    	materialSpecular = vec4( 1, 1, 1, 1.0 );
-    	materialShiness=50;
-    	SetupLightMat();
-		mvMatrixStack.push(modelViewMatrix);
-		r=rotate(90.0, 0.0, 0.0, 1.0);
-        modelViewMatrix=mult(modelViewMatrix, r);
-		DrawWall(0.02, 1); 
-		modelViewMatrix=mvMatrixStack.pop();
-	
-		// wall #3: in xy-plane
-		mvMatrixStack.push(modelViewMatrix);
-		r=rotate(-90, 1.0, 0.0, 0.0);
-        modelViewMatrix=mult(modelViewMatrix, r);
-		DrawWall(0.02, 2); 
-		modelViewMatrix=mvMatrixStack.pop();
-	}
 	
 	gl.uniform1i(gl.getUniformLocation(program, "textureFlag"), 0);  // stop using texture
 
@@ -1129,6 +1276,9 @@ function render()
 		}
 	}
 
+	gl.uniform1i(gl.getUniformLocation(program, "textureFlag"), 1);  // start using texture
+
+	gl.uniform1i(gl.getUniformLocation(program, "texture"), 1);  // fragment shader to use gl.TEXTURE0
 	// Sofa
 	{
 		mvMatrixStack.push(modelViewMatrix);
@@ -1138,6 +1288,7 @@ function render()
 		modelViewMatrix=mvMatrixStack.pop();
 	}
 	
+	gl.uniform1i(gl.getUniformLocation(program, "textureFlag"), 0);  // stop using texture
 	// Table
 	{
 		materialAmbient = vec4( .5, .5, .5, 1.0 );
@@ -1223,6 +1374,43 @@ function render()
 		}
 	}
 
+	// Walls & Floor
+	{
+		gl.uniform1i(gl.getUniformLocation(program, "textureFlag"), 1);  // start using texture
+		gl.uniform1i(gl.getUniformLocation(program, "texture"), 2);  // fragment shader to use gl.TEXTURE0
+		// floor: wall in xz-plane
+		lightPosition = vec4(-0.11, 0.475, -0.15, -2 );
+		materialAmbient = vec4( .1,.1,.1,.1 );
+    	materialDiffuse = vec4( 0/255, 246/255, 202/255, 1.0);
+    	materialSpecular = vec4( 0,0,0,1 );
+    	materialShiness = 0;
+    	SetupLightMat();
+
+		DrawWall(0.02, 0); 
+
+		gl.uniform1i(gl.getUniformLocation(program, "textureFlag"), 0);  // stop using texture
+	
+		lightPosition = vec4(-0.21, 0.475, -0.15, 0 );
+		// wall #2: in yz-plane
+		materialAmbient = vec4( 1.75, 1.75, 1.75, 1.0 );
+    	materialDiffuse = vec4( 255/255, 145/255, 164/255, 1.0);
+    	materialSpecular = vec4( 1, 1, 1, 1.0 );
+    	materialShiness=50;
+    	SetupLightMat();
+		mvMatrixStack.push(modelViewMatrix);
+		r=rotate(90.0, 0.0, 0.0, 1.0);
+        modelViewMatrix=mult(modelViewMatrix, r);
+		DrawWall(0.02, 1); 
+		modelViewMatrix=mvMatrixStack.pop();
+	
+		// wall #3: in xy-plane
+		mvMatrixStack.push(modelViewMatrix);
+		r=rotate(-90, 1.0, 0.0, 0.0);
+        modelViewMatrix=mult(modelViewMatrix, r);
+		DrawWall(0.02, 2); 
+		modelViewMatrix=mvMatrixStack.pop();
+	}
+
 	// Rug
 	{
 		// Layer 1
@@ -1305,9 +1493,6 @@ function render()
 		}
 	}
 
-	gl.uniform1i(gl.getUniformLocation(program, "textureFlag"), 2);  // start using texture
-
-	gl.uniform1i(gl.getUniformLocation(program, "texture"), 1);  // fragment shader to use gl.TEXTURE0
 	// Pic Frame
 	{
 		mvMatrixStack.push(modelViewMatrix);
@@ -1315,6 +1500,7 @@ function render()
 		modelViewMatrix=mvMatrixStack.pop();
 	}
 
+	gl.uniform1i(gl.getUniformLocation(program, "textureFlag"), 0);  // stop using texture
 	// Floor Lamp
 	{
 		mvMatrixStack.push(modelViewMatrix);
@@ -1374,9 +1560,16 @@ function render()
 		modelViewMatrix=mvMatrixStack.pop();
 	}
 
-	//console.log("phi: " + AllInfo.phi + "\ntheta: " + AllInfo.theta);
-    //console.log("zoom: " + AllInfo.zoomFactor + "\ntransX: " + AllInfo.translateX +
-                //"\ntansY: " + AllInfo.translateY);
+	// Family
+	{
+		mvMatrixStack.push(modelViewMatrix);
+		DrawPainting();
+		modelViewMatrix=mvMatrixStack.pop();
+	}
+
+	console.log("phi: " + AllInfo.phi + "\ntheta: " + AllInfo.theta);
+    console.log("zoom: " + AllInfo.zoomFactor + "\ntransX: " + AllInfo.translateX +
+                "\ntansY: " + AllInfo.translateY);
 
     requestAnimFrame(render);
 }
@@ -1604,6 +1797,9 @@ function Cylinderize() {
 		normalsArray.push(normal);
 		normalsArray.push(normal);
 		normalsArray.push(normal);
+		texCoordsArray.push(texCoord[0]);
+	  	texCoordsArray.push(texCoord[1]);
+	  	texCoordsArray.push(texCoord[2]);
 		cylinderCount += 3;
 	}
 	// top face
@@ -1621,6 +1817,9 @@ function Cylinderize() {
 		normalsArray.push(normal);
 		normalsArray.push(normal);
 		normalsArray.push(normal);
+		texCoordsArray.push(texCoord[0]);
+	  	texCoordsArray.push(texCoord[1]);
+	  	texCoordsArray.push(texCoord[2]);
 		cylinderCount += 3;
 	}
 	
@@ -1641,16 +1840,28 @@ function CylSide(a, b, c, d) {
 
     pointsArray.push(circleOneVert[a]);
     normalsArray.push(normal);
+	texCoordsArray.push(texCoord[0]);
+
     pointsArray.push(circleOneVert[b]);
     normalsArray.push(normal);
+	texCoordsArray.push(texCoord[1]);
+
     pointsArray.push(circleTwoVert[c]);
     normalsArray.push(normal);
+	texCoordsArray.push(texCoord[2]);
+
     pointsArray.push(circleOneVert[a]);
     normalsArray.push(normal);
+	texCoordsArray.push(texCoord[0]);
+
     pointsArray.push(circleTwoVert[c]);
     normalsArray.push(normal);
+	texCoordsArray.push(texCoord[2]);
+
     pointsArray.push(circleTwoVert[d]);
     normalsArray.push(normal);
+	texCoordsArray.push(texCoord[3]);
+
     cylinderCount += 6;
 }
 
@@ -1750,12 +1961,15 @@ function polygon(indices)
     {
         pointsArray.push(vertices[indices[0]]);
         normalsArray.push(normal);
+		texCoordsArray.push(texCoord[0]);
 
         pointsArray.push(vertices[indices[prev]]);
         normalsArray.push(normal);
+		texCoordsArray.push(texCoord[1]);
 
         pointsArray.push(vertices[indices[next]]);
         normalsArray.push(normal);
+		texCoordsArray.push(texCoord[2]);
 
         prev=next;
         next=next+1;
@@ -1806,7 +2020,7 @@ function NewellL(indices)
    return (normalize(vec3(x, y, z)));
 }
 
-function generateConePoints(coneR1, coneR2, coneHeight, coneColor) {
+function generateConePoints(coneR1, coneR2, coneHeight) {
 	let Phi = 0,
 	  dPhi = 2 * Math.PI / (nPhi - 1);
 	let Nx = coneR1 - coneR2;
@@ -1824,6 +2038,8 @@ function generateConePoints(coneR1, coneR2, coneHeight, coneColor) {
   
 	  pointsArray.push(vec4(-coneHeight / 2, cosPhi * coneR1, sinPhi * coneR1, 1.0));
 	  pointsArray.push(vec4(coneHeight / 2, cosPhi2 * coneR2, sinPhi2 * coneR2, 1.0));
+	  texCoordsArray.push(texCoord[0]);
+	  texCoordsArray.push(texCoord[1]);
   
 	  Phi += dPhi;
 	}
@@ -1859,6 +2075,10 @@ function generateCylinderFaces(pA, pB, sideColor, faceColor) {
 	  pointsArray.push(pA);
 	  pointsArray.push(cylinderVertB[i]);
 	  pointsArray.push(cylinderVertB[i + 1]);
+
+	  texCoordsArray.push(texCoord[0]);
+	  texCoordsArray.push(texCoord[1]);
+	  texCoordsArray.push(texCoord[2]);
   
 	  currCylinderPoint += 3;
 	  
@@ -1871,6 +2091,10 @@ function generateCylinderFaces(pA, pB, sideColor, faceColor) {
 	  pointsArray.push(pB);
 	  pointsArray.push(cylinderVertA[i]);
 	  pointsArray.push(cylinderVertA[i + 1]);
+
+	  texCoordsArray.push(texCoord[0]);
+	  texCoordsArray.push(texCoord[1]);
+	  texCoordsArray.push(texCoord[2]);
   
 	  currCylinderPoint += 3;
 	}
@@ -1890,6 +2114,13 @@ function generateCylinderSides(a, b, c, d, sideColor) {
 	pointsArray.push(cylinderVertA[a]);
 	pointsArray.push(cylinderVertB[c]);
 	pointsArray.push(cylinderVertB[d]);
+
+	texCoordsArray.push(texCoord[0]);
+	texCoordsArray.push(texCoord[1]);
+	texCoordsArray.push(texCoord[2]);
+	texCoordsArray.push(texCoord[0]);
+	texCoordsArray.push(texCoord[2]);
+	texCoordsArray.push(texCoord[3]);
   
 	currCylinderPoint += 6;
   }
